@@ -1,0 +1,10 @@
+[remote]
+hostname = remote.example.com
+port = 22
+username = buddyc
+password = v13W.a5k3wn1v3r$e
+sumfile = md5sums.txt
+lockfile = .siphon.lock
+
+[db]
+filename = siphon.db
