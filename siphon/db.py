@@ -14,8 +14,9 @@ class DBManager(object):
         cursor.execute("CREATE TABLE IF NOT EXISTS _metadata ("
                        "version INT"
                        ")")
-        cursor.execute("INSERT INTO _metadata VALUES (%d)" %
-                       self.SchemaVersion)
+        if not self.version():
+            cursor.execute("INSERT INTO _metadata VALUES (%d)" %
+                           self.SchemaVersion)
 
         cursor.execute("CREATE TABLE IF NOT EXISTS remote_files ("
                        "sum TEXT(32), "
@@ -40,26 +41,31 @@ class DBManager(object):
         result = cursor.execute("SELECT sum, name, path FROM remote_files")
         return result.fetchall()
 
-    def get_sum(self, sum=None, name=None):
-        if sum is None and name is None:
+    def get_sum(self, file_sum=None, file_name=None):
+        if file_sum is None and file_name is None:
             return None
 
-        if sum is not None:
-            criteria = "sum = '%s'" % sum
-        elif name is not None:
-            criteria = "name = '%s'" % sum
+        criteria_values = ()
+
+        if file_sum is not None:
+            criteria = "sum = ?"
+            criteria_values += (file_sum,)
+        elif file_name is not None:
+            criteria = "file_name = ?"
+            criteria_values += (file_name,)
 
         cursor = self._conn.cursor()
         result = cursor.execute("SELECT sum, name, path "
                                 "FROM remote_files "
-                                "WHERE %s" % criteria)
+                                "WHERE %s" % criteria,
+                                criteria_values)
         return result.fetchone()
 
-    def add_file(self, sum, name, path, retrieved=0):
+    def add_file(self, file_sum, file_name, path, retrieved=0):
         cursor = self._conn.cursor()
         cursor.execute("INSERT INTO remote_files VALUES(?, ?, ?, ?)",
-                       (sum,
-                        name.decode('utf-8', 'ignore'),
+                       (file_sum,
+                        file_name.decode('utf-8', 'ignore'),
                         path.decode('utf-8', 'ignore'),
                         retrieved))
         self._conn.commit()

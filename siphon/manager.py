@@ -27,10 +27,16 @@ class RemoteFileManager(object):
                 self._client.open(path, 'r')
                 print('Waiting for lock on sums file to be released...')
                 sleep(sleep_time)
-            except:
+            except Exception:
                 ## No lock file present on remote
                 break
 
     def file_iter(self, path):
+        try:
+            self._client.stat(path)
+        except IOError:
+            with self._client.open(path, 'w') as remote_file:
+                remote_file.close()
+
         for line in self._client.open(path, 'r'):
             yield line

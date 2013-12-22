@@ -29,13 +29,15 @@ def main():
         ## Use None as the delimiter so the two spaces after hash that md5sum
         ## generates are treated as one delimiter
         bits = line.strip().split(None, 1)
-        sum = bits[0]
-        path = bits[1]
+        file_sum = bits[0]
+        file_path = bits[1]
 
-        record = db.get_sum(sum=sum)
+        record = db.get_sum(file_sum=file_sum)
         if not record:
-            print('New remote file: %s => %s' % (sum, path))
-            db.add_file(sum=sum, name=basename(path), path=path)
+            print('New remote file: %s => %s' % (file_sum, file_path))
+            db.add_file(file_sum=file_sum,
+                        file_name=basename(file_path),
+                        path=file_path)
             new_count += 1
 
     print('Found %d new files in remote list.' % new_count)

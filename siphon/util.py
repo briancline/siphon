@@ -2,7 +2,7 @@ from ConfigParser import SafeConfigParser
 from argparse import ArgumentParser, FileType
 
 
-def load_config(fd):
+def load_config(config_file):
     defaults = {'remote': {'hostname': 'localhost',
                            'port': 22,
                            'username': 'guest',
@@ -12,8 +12,8 @@ def load_config(fd):
                 'db': {'filename': 'siphon.db'}}
 
     config = SafeConfigParser(defaults)
-    config.readfp(fd)
-    fd.close()
+    config.readfp(config_file)
+    config_file.close()
 
     return config
 
